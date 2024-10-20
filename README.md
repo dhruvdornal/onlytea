@@ -1,0 +1,1 @@
+Nothing much just a small side project I made for fun, it's kinda donations page for Indian content creators to get appraisal for their work from others, anyone with the link can donate directly to the creator's bank account.

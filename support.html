@@ -1,0 +1,228 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Your Favorite Creators</title>
+    <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script><link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(to right, #ffafbd, #ffc3a0);
+        }
+
+        .container {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        p {
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        #qrcode-container {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #e2e2e2;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .generate-button,
+        .share-button {
+            margin-top: 20px;
+            padding: 10px 25px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .generate-button:hover,
+        .share-button:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        #qrcode {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: auto;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .form-group {
+            margin-top: 20px;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .donation-section h2 {
+            margin-top: 20px;
+            color: #333;
+        }
+
+        .donation-section button {
+            margin: 5px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .donation-section button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Support <span id="fname"></span></h1>
+        <p>UPI ID:<span id="displayUPI"></span></p>
+        <div id="qrcode-container">
+            <div id="qrcode"></div>
+            <div id="upiText"></div>
+        </div>
+        <button class="share-button" id="shareButton" style="display:none;">Share on WhatsApp</button>
+        <p>Your donations help creators thrive and continue producing amazing content. Choose an amount below or enter your own pledge to make a difference!</p>
+        <div class="form-group">
+            <input type="number" min="1" max="2000" id="famount" placeholder="Enter Amount" required="">
+        </div>
+        <div class="donation-section">
+            <h2>Select a quick donation amount:</h2>
+            <button type="button" onclick="setPledgeAmount(10)">Donate ₹10</button>
+            <button type="button" onclick="setPledgeAmount(25)">Donate ₹25</button>
+            <button type="button" onclick="setPledgeAmount(50)">Donate ₹50</button>
+            <button type="button" onclick="setPledgeAmount(100)">Donate ₹100</button>
+        </div>
+        <button class="generate-button" onclick="generateUPIButton()">Pay via UPI</button>
+        <p>OR</p>
+        <button class="generate-button" onclick="genQR()">Generate QR Code</button>
+    </div>
+    <script>
+        function getQueryParams() {
+            const params = {};
+            const queryString = window.location.search.substring(1);
+            const queryArray = queryString.split("&");
+            queryArray.forEach(function (pair) {
+                const [key, value] = pair.split("=");
+                params[decodeURIComponent(key)] = decodeURIComponent(value);
+            });
+            return params;
+        }
+        function setPledgeAmount(amount) {
+            document.getElementById('famount').value = amount;
+        }
+
+        function genQR(){
+            const upi = document.getElementById('displayUPI').textContent.trim();
+            const name = document.getElementById('fname').textContent.trim();
+            const amount = document.getElementById('famount').value.trim();
+            if (!upi || upi === 'N/A' || !name || !amount) {
+                alert('Please fill out all fields.');
+                return;
+            }
+            if (amount > 2000) {
+                alert('Amount must not exceed ₹2000.');
+                return;
+            }
+            const encodedName = encodeURIComponent(name);
+            const upiLink = `upi://pay?pa=${upi}&pn=${encodedName}&am=${amount}&cu=INR`;
+            const qrcodeContainer = document.getElementById('qrcode');
+            qrcodeContainer.innerHTML = '';
+            new QRCode(qrcodeContainer, {
+                text: upiLink,
+                width: 200,
+                height: 200
+            });
+            document.getElementById('upiText').textContent = `Pay ₹${amount} Using UPI`;
+            const container = document.getElementById('qrcode-container');
+            container.classList.add('show');
+            container.style.display = 'block';
+            // Show the share button
+            document.getElementById('shareButton').style.display = 'block';
+        }
+
+        function generateUPIButton() {
+            const upi = document.getElementById('displayUPI').textContent.trim();
+            const name = document.getElementById('fname').textContent.trim();
+            const amount = document.getElementById('famount').value.trim();
+            if (!upi || upi === 'N/A' || !name || !amount) {
+                alert('Please fill out all fields.');
+                return;
+            }
+            if (amount > 2000) {
+                alert('Amount must not exceed ₹2000.');
+                return;
+            }
+            const encodedName = encodeURIComponent(name);
+            const upiLink = `upi://pay?pa=${upi}&pn=${encodedName}&am=${amount}&cu=INR`;
+            window.open(`${upiLink}`);
+            // const qrcodeContainer = document.getElementById('qrcode');
+            // qrcodeContainer.innerHTML = '';
+            // new QRCode(qrcodeContainer, {
+            //     text: upiLink,
+            //     width: 200,
+            //     height: 200
+            // });
+            // document.getElementById('upiText').textContent = `Pay ₹${amount} Using UPI`;
+            // const container = document.getElementById('qrcode-container');
+            // container.classList.add('show');
+            // container.style.display = 'block';
+            // // Show the share button
+            // document.getElementById('shareButton').style.display = 'block';
+            // // Set up WhatsApp share link
+            // const message = `Support ${name} with a donation! Use this link: ${upiLink}`;
+            // const encodedMessage = encodeURIComponent(message);
+            // document.getElementById('shareButton').onclick = () => {
+            //     window.open(`https://api.whatsapp.com/send?text=${encodedMessage}`, '_blank');
+            // };
+
+            // document.getElementById('generateLinkButton').style.display = 'block';
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const params = getQueryParams();
+            const name = params.name || "Supporter";
+            const upi = params.upi || "N/A";
+            document.getElementById("fname").innerText = name;
+            document.getElementById("displayUPI").innerText = upi;
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+</html>
